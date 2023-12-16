@@ -18,14 +18,14 @@
 
 `getFlight/`
 
-`body:`
-`{`
-`    "departureCode": "AHU",`
-`    "arrivalCode": "AMS",`
-`    "date": "2024-05-20",`
-`    "numberOfAdults": 1,`
-`    "cabinClass": "Economy"`
-`}`
+`body:
+{
+    "departureCode": "AHU",
+    "arrivalCode": "AMS",
+    "date": "2024-05-20",
+    "numberOfAdults": 1,
+    "cabinClass": "Economy"
+}`
 
 Пример запроса через Postman:
 ![Пример](imgs/image.png)
