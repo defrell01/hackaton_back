@@ -1,0 +1,7 @@
+*.sqlite
+model/*.pkl
+*/__pacache__
+.idea/
+*.csv
+.env
+/venv
