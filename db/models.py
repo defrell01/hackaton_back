@@ -2,16 +2,14 @@ from pydantic import BaseModel
 
 
 class ApiRequest(BaseModel):
-    departureCode: str
-    arrivalCode: str
+    departure_city: str
+    destination_city: str
     date: str
     numberOfAdults: int
     cabinClass: str
 
 
 class PredictData(BaseModel):
-    airline: str
-    flight: str
     source_city: str
     departure_time: str
     stop: str

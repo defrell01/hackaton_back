@@ -5,32 +5,16 @@ import joblib
 from db.models import PredictData
 
 
-async def init_model():
-    try:
-        loaded_model = pickle.load(open('model/decision_tree_model.pkl', 'rb'))
-        return loaded_model
-    except Exception as e:
-        print(f'model{e}')
-        # print(e)
-        # raise e
+def predict_price(input_data: PredictData):
 
+    loaded_model = joblib.load("model/RF_model.pkl")
+    full_pipeline = joblib.load("model/full_pipeline.pkl")
 
-async def init_pipeline():
-    try:
-        full_pipeline = joblib.load("model/full_pipeline.pkl")
-
-        return full_pipeline
-    except Exception as e:
-        print(f'pipeline{e}')
-
-
-def predict_price(input_data: PredictData, loaded_model, full_pipeline):
-
-    df = pd.DataFrame([[input_data.airline, input_data.flight, input_data.source_city,
+    df = pd.DataFrame([[input_data.source_city,
                         input_data.departure_time, input_data.stop,
                         input_data.arrival_time, input_data.destination_city,
                         input_data.class_flight, input_data.duration, input_data.days_left]],
-                      columns=["airline", "flight", "source_city", "departure_time", "stops", "arrival_time",
+                      columns=["source_city", "departure_time", "stops", "arrival_time",
                                "destination_city", "class", "duration", "days_left"])
     df.index.name = 'id'
     df = pd.DataFrame(df)
@@ -39,7 +23,6 @@ def predict_price(input_data: PredictData, loaded_model, full_pipeline):
     data = pd.read_csv('file.csv', index_col='id')
 
     le = LabelEncoder()
-    data['airline'] = le.fit_transform(data['airline'])
     data['source_city'] = le.fit_transform(data['source_city'])
     data['destination_city'] = le.fit_transform(data['destination_city'])
     data['class'] = le.fit_transform(data['class'])
