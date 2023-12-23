@@ -1,64 +1,88 @@
 from datetime import datetime
 
 
-def parse_json_flights(data):
-
+def parse_json_flights(data, amount):
     data = data.json()
-
     legs = data['legs']
     fares = data['fares']
+    flight_data = []
 
-    price = fares[0]['price']['amount']
-    airline_code = legs[0]['airlineCodes'][0]
-    flight = legs[0]['segments'][0]['designatorCode']
+    for i in range(amount):
+        price = fares[i]['price']['amount']
+        airline_code = legs[i]['airlineCodes'][0]
+        flight = legs[i]['segments'][0]['designatorCode']
+        arrival_city = legs[i]['arrivalAirportCode']
+        dep_city = legs[i]['departureAirportCode']
+        stops = legs[i]['stopoversCount']
+        departure_time = legs[i]['departureDateTime']
+        arrival_time = legs[i]['arrivalDateTime']
+        target_date = datetime.fromisoformat(departure_time[0:19])
+        current_date = datetime.now()
+        difference = target_date - current_date
+        days_left = difference.days
 
-    arrival_city = legs[0]['arrivalAirportCode']
-    dep_city = legs[0]['departureAirportCode']
-    stops = legs[0]['stopoversCount']
+        cabin_class = legs[i]['segments'][0]['cabin']
+        duration = legs[i]['duration']
 
-    departure_time = legs[0]['departureDateTime']
+        flight_dict = {
+            "airline_code": airline_code,
+            "flight": flight,
+            "departure_city": dep_city,
+            "departure_time": departure_time,
+            "stops": stops,
+            "arrival_time": arrival_time,
+            "arrival_cty": arrival_city,
+            "cabin_class": cabin_class,
+            "duration": duration,
+            "days_left": days_left,
+            "price": 91 * price
+        }
 
-    target_date = datetime.fromisoformat(departure_time[0:19])
+        flight_data.append(flight_dict)
 
-    current_date = datetime.now()
+    return flight_data
 
-    difference = target_date - current_date
 
-    days_left = difference.days
+def parse_json_round_flights(data, amount):
+    flight_data = []
 
-    tmp = departure_time[11:13]
+    for idx, response in enumerate(data):
+        flight_info = response.json()
+        legs = flight_info['legs']
+        fares = flight_info['fares']
 
-    print(tmp)
-    tmp = int(tmp)
+        for i in range(amount):
+            price = fares[i]['price']['amount']
+            airline_code = legs[i]['airlineCodes'][0]
+            flight = legs[i]['segments'][0]['designatorCode']
+            arrival_city = legs[i]['arrivalAirportCode']
+            dep_city = legs[i]['departureAirportCode']
+            stops = legs[i]['stopoversCount']
+            departure_time = legs[i]['departureDateTime']
+            arrival_time = legs[i]['arrivalDateTime']
+            target_date = datetime.fromisoformat(departure_time[0:19])
+            current_date = datetime.now()
+            difference = target_date - current_date
+            days_left = difference.days
 
-    if (tmp > 4) & (tmp < 6):
-        departure_time = "Early_Morning"
-    elif (tmp >= 6) & (tmp <= 12):
-        departure_time = "Morning"
-    elif (tmp > 12) & (tmp < 22):
-        departure_time = "Afternoon"
-    else:
-        departure_time = "Night"
+            cabin_class = legs[i]['segments'][0]['cabin']
+            duration = legs[i]['duration']
 
-    arrival_time = legs[0]['arrivalDateTime']
+            flight_dict = {
+                "airline_code": airline_code,
+                "flight": flight,
+                "departure_city": dep_city,
+                "departure_time": departure_time,
+                "stops": stops,
+                "arrival_time": arrival_time,
+                "arrival_cty": arrival_city,
+                "cabin_class": cabin_class,
+                "duration": duration,
+                "days_left": days_left,
+                "price": 91 * price,
+                "flight_type": "forth" if idx % 2 == 0 else "back"
+            }
 
-    tmp_other = arrival_time[11:13]
-    tmp_other = int(tmp_other)
+            flight_data.append(flight_dict)
 
-    if (tmp_other > 4) & (tmp_other < 6):
-        arrival_time = "Early_Morning"
-    elif (tmp_other >= 6) & (tmp_other <= 12):
-        arrival_time = "Morning"
-    elif (tmp_other > 12) & (tmp_other < 22):
-        arrival_time = "Afternoon"
-    else:
-        arrival_time = "Night"
-
-    cabin_class = 'Economy'
-    duration = legs[0]['durationDays']
-    duration = duration * 24
-
-    resp = [airline_code, flight, dep_city, departure_time, stops, arrival_time, arrival_city, cabin_class,
-            duration, days_left, 91 * price]
-
-    return resp
+    return flight_data
