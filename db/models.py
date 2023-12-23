@@ -18,3 +18,12 @@ class PredictData(BaseModel):
     class_flight: str
     duration: float
     days_left: int
+
+
+class RoundTripRequest(BaseModel):
+    departure_city: str
+    destination_city: str
+    departure_date: str
+    back_departure_date: str
+    numberOfAdults: int
+    cabinClass: str

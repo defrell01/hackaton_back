@@ -1,9 +1,9 @@
-from util import parse_json_flights
+from util import parse_json_flights, parse_json_round_flights
 from fastapi import FastAPI, HTTPException
 import uvicorn
-from db.models import ApiRequest, PredictData
+from db.models import ApiRequest, PredictData, RoundTripRequest
 from db.database import add_flight
-from req.getFlight import get_flight
+from req.getFlight import get_flight, get_round_flight
 from model.predict import predict_price
 
 app = FastAPI()
@@ -14,7 +14,7 @@ def get_flight_endpoint(flight: ApiRequest):
     try:
         res = get_flight(flight)
 
-        data = parse_json_flights(res)
+        data = parse_json_flights(res, len(res.json()))
 
         add_flight(data)
 
@@ -22,19 +22,23 @@ def get_flight_endpoint(flight: ApiRequest):
         raise HTTPException(status_code=400, detail=str(e))
 
     finally:
+        return data
 
-        return {"airline_code": data[0],
-                "flight": data[1],
-                "departure_city": data[2],
-                "departure_time": data[3],
-                "stops": data[4],
-                "arrival_time": data[5],
-                "arrival_cty": data[6],
-                "cabin_class": data[7],
-                "duration": data[8],
-                "days_left": data[9],
-                "price": data[10]
-                }
+
+@app.get("/getFlight/")
+def get_flight_round_endpoint(flight: ApiRequest):
+    try:
+        res = get_flight(flight)
+
+        data = parse_json_flights(res, len(res.json()))
+
+        add_flight(data)
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    finally:
+        return data
 
 
 @app.get("/predictPrice")
@@ -56,6 +60,18 @@ def predict_price_endpoint(entry: PredictData):
                 "days_left": entry.days_left,
                 "price": data[0]
                 }
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/getRoundFlight")
+def get_round_flight_endpoint(RoundTripRequest: RoundTripRequest):
+    try:
+        res = get_round_flight(RoundTripRequest)
+        data = parse_json_round_flights(res, len(res))
+
+        return data
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
